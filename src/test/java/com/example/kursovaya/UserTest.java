@@ -63,7 +63,6 @@ class UserTest {
         );
     }
 
-
 // =========================
 // Тест ManagerUser
 // =========================
@@ -83,11 +82,11 @@ class UserTest {
         assertEquals("ivan@mail.ru", manager.getEmail());
         assertEquals(UserRole.MANAGER, manager.getRole());
         assertEquals("Отдел продаж", manager.getDepartment());
-        assertEquals(3, manager.getManagedProjects());
+        assertEquals(3, manager.getManagedOrders());
     }
 
     @Test
-    void testManagerUserAddProject() {
+    void testManagerUserAddOrder() {
         ManagerUser manager = new ManagerUser(
                 2L,
                 "Иван Смирнов",
@@ -96,13 +95,13 @@ class UserTest {
                 3
         );
 
-        manager.addProject();
+        manager.addOrder();
 
-        assertEquals(4, manager.getManagedProjects());
+        assertEquals(4, manager.getManagedOrders());
     }
 
     @Test
-    void testManagerUserRemoveProject() {
+    void testManagerUserRemoveOrder() {
         ManagerUser manager = new ManagerUser(
                 2L,
                 "Иван Смирнов",
@@ -111,9 +110,9 @@ class UserTest {
                 3
         );
 
-        manager.removeProject();
+        manager.removeOrder();
 
-        assertEquals(2, manager.getManagedProjects());
+        assertEquals(2, manager.getManagedOrders());
     }
 
     @Test
@@ -129,7 +128,6 @@ class UserTest {
                 )
         );
     }
-
 
 // =========================
 // Тест CustomerUser
@@ -198,7 +196,6 @@ class UserTest {
         );
     }
 
-
 // =========================
 // Проверка полиморфизма
 // =========================
@@ -232,7 +229,6 @@ class UserTest {
         assertEquals(UserRole.MANAGER, manager.getRole());
         assertEquals(UserRole.CUSTOMER, customer.getRole());
     }
-
 
 // =========================
 // Проверка toString()

@@ -1,14 +1,14 @@
 package model;
 public class ManagerUser extends User {
     private String department;
-    private int managedProjects;
+    private int managedOrders;
 
     public ManagerUser(
             long id,
             String name,
             String email,
             String department,
-            int managedProjects
+            int managedOrders
     ) {
         super(id, name, email, UserRole.MANAGER);
 
@@ -18,35 +18,35 @@ public class ManagerUser extends User {
             );
         }
 
-        if (managedProjects < 0) {
+        if (managedOrders < 0) {
             throw new IllegalArgumentException(
-                    "Количество проектов не может быть отрицательным"
+                    "Количество заказов не может быть отрицательным"
             );
         }
 
         this.department = department.trim();
-        this.managedProjects = managedProjects;
+        this.managedOrders = managedOrders;
     }
 
     public String getDepartment() {
         return department;
     }
 
-    public int getManagedProjects() {
-        return managedProjects;
+    public int getManagedOrders() {
+        return managedOrders;
     }
 
-    public void addProject() {
-        managedProjects++;
+    public void addOrder() {
+        managedOrders++;
     }
 
-    public void removeProject() {
-        if (managedProjects > 0) {
-            managedProjects--;
+    public void removeOrder() {
+        if (managedOrders > 0) {
+            managedOrders--;
         }
     }
 
-    public boolean canManageProjects() {
+    public boolean canManageOrders() {
         return true;
     }
 
@@ -55,7 +55,7 @@ public class ManagerUser extends User {
         return "Менеджер: " + getName()
                 + ", email: " + getEmail()
                 + ", отдел: " + department
-                + ", проектов: " + managedProjects;
+                + ", обрабатываемых заказов: " + managedOrders;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ManagerUser extends User {
                 ", email='" + getEmail() + '\'' +
                 ", role=" + getRole() +
                 ", department='" + department + '\'' +
-                ", managedProjects=" + managedProjects +
+                ", managedOrders=" + managedOrders +
                 '}';
     }
 }

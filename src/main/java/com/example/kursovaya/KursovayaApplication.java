@@ -1,6 +1,6 @@
 package com.example.kursovaya;
 import model.AdminUser; import model.CustomerUser; import model.ManagerUser; import model.User; import model.UserRole;
-import java.util.ArrayList; import java.util.Comparator; import java.util.List; import java.util.Map; import java.util.concurrent.ConcurrentHashMap; import java.util.concurrent.ExecutorService; import java.util.concurrent.Executors;
+import java.util.ArrayList; import java.util.Comparator; import java.util.List; import java.util.Map; import java.util.concurrent.ConcurrentHashMap; import java.util.concurrent.ExecutorService; import java.util.concurrent.Executors; import java.util.concurrent.TimeUnit;
 public class KursovayaApplication {
     public static void main(String[] args) {
 
@@ -9,23 +9,23 @@ public class KursovayaApplication {
         users.add(new AdminUser(
                 1,
                 "Анна Петрова",
-                "anna@company.ru",
+                "anna@shop.ru",
                 15
         ));
 
         users.add(new ManagerUser(
                 2,
                 "Иван Смирнов",
-                "ivan@company.ru",
-                "Продажи",
+                "ivan@shop.ru",
+                "Отдел продаж",
                 4
         ));
 
         users.add(new ManagerUser(
                 3,
                 "Мария Орлова",
-                "maria@company.ru",
-                "IT",
+                "maria@shop.ru",
+                "Отдел заказов",
                 7
         ));
 
@@ -53,7 +53,7 @@ public class KursovayaApplication {
 
         User foundUser = findByEmail(
                 users,
-                "maria@company.ru"
+                "maria@shop.ru"
         );
 
         if (foundUser != null) {
@@ -241,7 +241,10 @@ public class KursovayaApplication {
         executor.shutdown();
 
         try {
-            if (!executor.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS)) {
+            if (!executor.awaitTermination(
+                    10,
+                    TimeUnit.SECONDS)) {
+
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
