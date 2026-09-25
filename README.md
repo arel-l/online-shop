@@ -31,3 +31,10 @@ src/
 └── com/example/kursovaya/
 ├── KursovayaApplicationTests.java
 └── UserTest.java
+
+## Основные классы
+• User — абстрактный базовый класс пользователя.
+• AdminUser — администратор системы.
+• ManagerUser — менеджер заказов.
+• CustomerUser — клиент интернет-магазина.
+• UserRole — перечисление ролей пользователей.
