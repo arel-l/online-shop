@@ -1,7 +1,8 @@
 package com.example.kursovaya;
 import model.AdminUser; import model.CustomerUser; import model.ManagerUser; import model.User; import model.UserRole;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.ArrayList; import java.util.Comparator; import java.util.List; import java.util.Map; import java.util.concurrent.ConcurrentHashMap; import java.util.concurrent.ExecutorService; import java.util.concurrent.Executors; import java.util.concurrent.TimeUnit;
-public class KursovayaApplication {
+@SpringBootApplication public class KursovayaApplication {
     public static void main(String[] args) {
 
         List<User> users = new ArrayList<>();
@@ -157,16 +158,19 @@ public class KursovayaApplication {
 
         if (user == null) {
             throw new IllegalArgumentException(
-                    "Пользователь не может быть null");
+                    "Пользователь не может быть null"
+            );
         }
 
         boolean exists = users.stream()
                 .anyMatch(existing ->
-                        existing.getId() == user.getId());
+                        existing.getId() == user.getId()
+                );
 
         if (exists) {
             throw new IllegalArgumentException(
-                    "Пользователь с таким ID уже существует");
+                    "Пользователь с таким ID уже существует"
+            );
         }
 
         users.add(user);
