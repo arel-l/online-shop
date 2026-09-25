@@ -1,4 +1,4 @@
-package model;
+package com.example.kursovaya.model;
 public class CustomerUser extends User {
     private String company;
     private double totalOrders;

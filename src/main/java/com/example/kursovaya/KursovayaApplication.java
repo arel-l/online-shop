@@ -1,9 +1,14 @@
 package com.example.kursovaya;
-import model.AdminUser; import model.CustomerUser; import model.ManagerUser; import model.User; import model.UserRole;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import java.util.ArrayList; import java.util.Comparator; import java.util.List; import java.util.Map; import java.util.concurrent.ConcurrentHashMap; import java.util.concurrent.ExecutorService; import java.util.concurrent.Executors; import java.util.concurrent.TimeUnit;
+import com.example.kursovaya.model.AdminUser; import com.example.kursovaya.model.CustomerUser; import com.example.kursovaya.model.ManagerUser; import com.example.kursovaya.model.User; import com.example.kursovaya.model.UserRole; import com.example.kursovaya.service.UserProcessingService; import com.example.kursovaya.service.UserProcessingServiceImpl; import com.example.kursovaya.service.UserService; import com.example.kursovaya.service.UserServiceImpl; import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.util.ArrayList; import java.util.Comparator; import java.util.List;
 @SpringBootApplication public class KursovayaApplication {
     public static void main(String[] args) {
+
+        UserService userService =
+                new UserServiceImpl();
+
+        UserProcessingService processingService =
+                new UserProcessingServiceImpl();
 
         List<User> users = new ArrayList<>();
 
@@ -48,11 +53,11 @@ import java.util.ArrayList; import java.util.Comparator; import java.util.List; 
 
         System.out.println("===== СПИСОК ПОЛЬЗОВАТЕЛЕЙ =====");
 
-        printUsers(users);
+        userService.printUsers(users);
 
         System.out.println("\n===== ПОИСК ПОЛЬЗОВАТЕЛЯ =====");
 
-        User foundUser = findByEmail(
+        User foundUser = userService.findByEmail(
                 users,
                 "maria@shop.ru"
         );
@@ -65,7 +70,7 @@ import java.util.ArrayList; import java.util.Comparator; import java.util.List; 
 
         System.out.println("\n===== ФИЛЬТРАЦИЯ ПО РОЛИ =====");
 
-        List<User> managers = findByRole(
+        List<User> managers = userService.findByRole(
                 users,
                 UserRole.MANAGER
         );
@@ -80,7 +85,7 @@ import java.util.ArrayList; import java.util.Comparator; import java.util.List; 
                 Comparator.comparing(User::getName)
         );
 
-        printUsers(users);
+        userService.printUsers(users);
 
         System.out.println("\n===== ДОБАВЛЕНИЕ =====");
 
@@ -92,7 +97,7 @@ import java.util.ArrayList; import java.util.Comparator; import java.util.List; 
                 45000
         );
 
-        addUser(users, newUser);
+        userService.addUser(users, newUser);
 
         System.out.println(
                 "Добавлен пользователь: " +
@@ -101,7 +106,10 @@ import java.util.ArrayList; import java.util.Comparator; import java.util.List; 
 
         System.out.println("\n===== УДАЛЕНИЕ =====");
 
-        boolean removed = removeById(users, 6);
+        boolean removed = userService.removeById(
+                users,
+                6
+        );
 
         System.out.println(
                 "Пользователь удалён: " + removed
@@ -109,157 +117,10 @@ import java.util.ArrayList; import java.util.Comparator; import java.util.List; 
 
         System.out.println("\n===== СТАТИСТИКА =====");
 
-        printStatistics(users);
+        userService.printStatistics(users);
 
         System.out.println("\n===== МНОГОПОТОЧНАЯ ОБРАБОТКА =====");
 
-        processUsersInParallel(users);
-    }
-
-    public static void printUsers(List<User> users) {
-
-        for (User user : users) {
-            System.out.println(
-                    "ID: " + user.getId() +
-                            ", имя: " + user.getName() +
-                            ", email: " + user.getEmail() +
-                            ", роль: " + user.getRole()
-            );
-        }
-    }
-
-    public static User findByEmail(
-            List<User> users,
-            String email) {
-
-        if (email == null || email.isBlank()) {
-            return null;
-        }
-
-        return users.stream()
-                .filter(user ->
-                        user.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public static List<User> findByRole(
-            List<User> users,
-            UserRole role) {
-
-        return users.stream()
-                .filter(user -> user.getRole() == role)
-                .toList();
-    }
-
-    public static void addUser(
-            List<User> users,
-            User user) {
-
-        if (user == null) {
-            throw new IllegalArgumentException(
-                    "Пользователь не может быть null"
-            );
-        }
-
-        boolean exists = users.stream()
-                .anyMatch(existing ->
-                        existing.getId() == user.getId()
-                );
-
-        if (exists) {
-            throw new IllegalArgumentException(
-                    "Пользователь с таким ID уже существует"
-            );
-        }
-
-        users.add(user);
-    }
-
-    public static boolean removeById(
-            List<User> users,
-            long id) {
-
-        return users.removeIf(
-                user -> user.getId() == id
-        );
-    }
-
-    public static void printStatistics(
-            List<User> users) {
-
-        Map<UserRole, Long> statistics =
-                new java.util.EnumMap<>(UserRole.class);
-
-        for (UserRole role : UserRole.values()) {
-            statistics.put(
-                    role,
-                    users.stream()
-                            .filter(user ->
-                                    user.getRole() == role)
-                            .count()
-            );
-        }
-
-        for (Map.Entry<UserRole, Long> entry :
-                statistics.entrySet()) {
-
-            System.out.println(
-                    entry.getKey() +
-                            ": " +
-                            entry.getValue()
-            );
-        }
-    }
-
-    public static void processUsersInParallel(
-            List<User> users) {
-
-        ExecutorService executor =
-                Executors.newFixedThreadPool(3);
-
-        Map<Long, String> results =
-                new ConcurrentHashMap<>();
-
-        for (User user : users) {
-
-            executor.submit(() -> {
-
-                String threadName =
-                        Thread.currentThread().getName();
-
-                String result =
-                        threadName +
-                                " обрабатывает пользователя " +
-                                user.getName();
-
-                results.put(
-                        user.getId(),
-                        result
-                );
-
-                System.out.println(result);
-            });
-        }
-
-        executor.shutdown();
-
-        try {
-            if (!executor.awaitTermination(
-                    10,
-                    TimeUnit.SECONDS)) {
-
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-
-        System.out.println("\nРезультаты обработки:");
-
-        results.values().forEach(
-                System.out::println
-        );
+        processingService.processUsersInParallel(users);
     }
 }

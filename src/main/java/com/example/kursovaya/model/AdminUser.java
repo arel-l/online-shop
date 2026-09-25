@@ -1,4 +1,4 @@
-package model;
+package com.example.kursovaya.model;
 public class AdminUser extends User {
     private int managedUsersCount;
 

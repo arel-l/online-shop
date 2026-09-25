@@ -1,4 +1,4 @@
-package model;
+package com.example.kursovaya.model;
 public enum UserRole {
     ADMIN("Администратор", 3),
     MANAGER("Менеджер", 2),

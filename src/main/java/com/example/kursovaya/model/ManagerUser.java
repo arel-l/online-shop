@@ -1,4 +1,4 @@
-package model;
+package com.example.kursovaya.model;
 public class ManagerUser extends User {
     private String department;
     private int managedOrders;

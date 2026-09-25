@@ -1,5 +1,5 @@
 package com.example.kursovaya;
-import model.AdminUser; import model.CustomerUser; import model.ManagerUser; import model.User; import model.UserRole; import org.junit.jupiter.api.Test;
+import com.example.kursovaya.model.AdminUser; import com.example.kursovaya.model.CustomerUser; import com.example.kursovaya.model.ManagerUser; import com.example.kursovaya.model.User; import com.example.kursovaya.model.UserRole; import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class UserTest {
 // =========================

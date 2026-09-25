@@ -1,4 +1,4 @@
-package model;
+package com.example.kursovaya.model;
 import java.util.Objects;
 public abstract class User {
     private long id;
