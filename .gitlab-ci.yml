@@ -1,13 +1,6 @@
-image: maven:3-openjdk-17
-
-variables:
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version --no-transfer-progress"
-
-cache:
-  paths:
-    - .m2/repository/
-
+stages:
+  test
 test:
   stage: test
   script:
-    - mvn $MAVEN_CLI_OPTS test
+    - .\mvnw.cmd --batch-mode --errors --fail-at-end --show-version --no-transfer-progress test
