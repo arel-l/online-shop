@@ -1,6 +1,0 @@
-stages:
-  - test
-test:
-  stage: test
-  script:
-    - .\mvnw.cmd --batch-mode --errors --fail-at-end --show-version --no-transfer-progress test
