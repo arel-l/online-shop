@@ -37,3 +37,28 @@ KursovayaApplication — точка входа и запуск приложен�
 Тесты
 KursovayaApplicationTests — проверка запуска Spring Boot-приложения.
 UserTest — модульное тестирование классов пользователей.
+## Структура проекта
+src/
+├── main/
+│   └── java/
+│       └── com/example/kursovaya/
+│           ├── model/
+│           │   ├── User.java
+│           │   ├── UserRole.java
+│           │   ├── AdminUser.java
+│           │   ├── ManagerUser.java
+│           │   └── CustomerUser.java
+│           │
+│           ├── service/
+│           │   ├── UserService.java
+│           │   ├── UserServiceImpl.java
+│           │   ├── UserProcessingService.java
+│           │   └── UserProcessingServiceImpl.java
+│           │
+│           └── KursovayaApplication.java
+│
+└── test/
+    └── java/
+        └── com/example/kursovaya/
+            ├── KursovayaApplicationTests.java
+            └── UserTest.java
