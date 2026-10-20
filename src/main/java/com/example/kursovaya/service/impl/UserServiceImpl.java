@@ -1,5 +1,7 @@
-package com.example.kursovaya.service;
+package com.example.kursovaya.service.impl;
 import com.example.kursovaya.model.User; import com.example.kursovaya.model.UserRole;
+import com.example.kursovaya.service.UserService;
+
 import java.util.EnumMap; import java.util.List; import java.util.Map;
 public class UserServiceImpl implements UserService {
     @Override
