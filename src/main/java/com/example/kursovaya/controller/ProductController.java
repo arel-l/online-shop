@@ -1,11 +1,10 @@
 package com.example.kursovaya.controller;
-import com.example.kursovaya.*;
-import com.example.kursovaya.repository.ProductJpaRepository;
+
+import com.example.kursovaya.Product;
+import com.example.kursovaya.exception.ProductNotFoundException;
 import com.example.kursovaya.service.ProductService;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -18,133 +17,80 @@ import java.util.Optional;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRequestMapper productRequestMapper;
 
-    public ProductController(ProductService productService) {
+    public ProductController(
+            ProductService productService,
+            ProductRequestMapper productRequestMapper) {
         this.productService = productService;
+        this.productRequestMapper = productRequestMapper;
     }
 
     @GetMapping("/{article}")
     public ResponseEntity<Product> getProductByArticle(
             @PathVariable String article) {
 
-        return productService.getProductByArticle(article)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Product> product =
+                productService.getProductByArticle(article);
+
+        if (product.isEmpty()) {
+            throw new ProductNotFoundException(article);
+        }
+
+        return ResponseEntity.ok(product.get());
     }
+
     @GetMapping
     public List<Product> getAllProducts(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {
 
+        if (minPrice != null && maxPrice != null
+                && minPrice.compareTo(maxPrice) > 0) {
+            throw new com.example.kursovaya.exception.InvalidProductDataException(
+                    "Минимальная цена не может превышать максимальную.");
+        }
+
         return productService.getFilteredProducts(
-                category, minPrice, maxPrice
-        );
+                category, minPrice, maxPrice);
     }
+
     @PostMapping
-    public ResponseEntity<?> addProduct(
+    public ResponseEntity<Product> addProduct(
             @RequestBody Map<String, Object> request) {
 
-        try {
-            String article = (String) request.get("article");
-            String productName = (String) request.get("productName");
-            String category = (String) request.get("category");
-            BigDecimal price = new BigDecimal(
-                    request.get("price").toString());
-            int stockQuantity = Integer.parseInt(
-                    request.get("stockQuantity").toString());
-            String productType = (String) request.get("productType");
+        Product product = productRequestMapper.toProduct(
+                request, null);
 
-            Product product;
+        Product savedProduct = productService.addProduct(product);
 
-            switch (productType.toUpperCase()) {
-                case "SMARTPHONE":
-                    product = new SmartphoneProduct(
-                            article, productName, category,
-                            price, stockQuantity);
-                    break;
-
-                case "LAPTOP":
-                    product = new LaptopProduct(
-                            article, productName, category,
-                            price, stockQuantity);
-                    break;
-
-                case "TELEVISION":
-                    product = new TelevisionProduct(
-                            article, productName, category,
-                            price, stockQuantity);
-                    break;
-
-                default:
-                    return ResponseEntity.badRequest()
-                            .body("Неизвестный тип товара");
-            }
-
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(productService.addProduct(product));
-
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(savedProduct);
     }
 
     @PutMapping("/{article}")
-    public ResponseEntity<?> updateProduct(
+    public ResponseEntity<Product> updateProduct(
             @PathVariable String article,
             @RequestBody Map<String, Object> request) {
 
-        try {
-            String productName = (String) request.get("productName");
-            String category = (String) request.get("category");
-            BigDecimal price = new BigDecimal(
-                    request.get("price").toString());
-            int stockQuantity = Integer.parseInt(
-                    request.get("stockQuantity").toString());
-            String productType = (String) request.get("productType");
+        Product product = productRequestMapper.toProduct(
+                request, article);
 
-            Product product;
+        Product updatedProduct =
+                productService.updateProduct(article, product);
 
-            switch (productType.toUpperCase()) {
-                case "SMARTPHONE":
-                    product = new SmartphoneProduct(
-                            article, productName, category,
-                            price, stockQuantity);
-                    break;
-
-                case "LAPTOP":
-                    product = new LaptopProduct(
-                            article, productName, category,
-                            price, stockQuantity);
-                    break;
-
-                case "TELEVISION":
-                    product = new TelevisionProduct(
-                            article, productName, category,
-                            price, stockQuantity);
-                    break;
-
-                default:
-                    return ResponseEntity.badRequest()
-                            .body("Неизвестный тип товара");
-            }
-
-            return ResponseEntity.ok(
-                    productService.updateProduct(article, product));
-
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(updatedProduct);
     }
 
     @DeleteMapping("/{article}")
     public ResponseEntity<Void> deleteProduct(
             @PathVariable String article) {
 
-        if (productService.deleteProduct(article)) {
-            return ResponseEntity.noContent().build();
+        if (!productService.deleteProduct(article)) {
+            throw new ProductNotFoundException(article);
         }
 
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 }

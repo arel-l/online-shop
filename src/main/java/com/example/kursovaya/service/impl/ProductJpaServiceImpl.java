@@ -5,15 +5,17 @@ import com.example.kursovaya.ProductEntity;
 import com.example.kursovaya.SmartphoneProduct;
 import com.example.kursovaya.LaptopProduct;
 import com.example.kursovaya.TelevisionProduct;
+import com.example.kursovaya.exception.InvalidProductDataException;
+import com.example.kursovaya.exception.ProductAlreadyExistsException;
+import com.example.kursovaya.exception.ProductNotFoundException;
 import com.example.kursovaya.repository.ProductJpaRepository;
 import com.example.kursovaya.service.ProductService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Profile("!test")
@@ -40,15 +42,20 @@ public class ProductJpaServiceImpl implements ProductService {
 
     @Override
     public Product addProduct(Product product) {
-        if (product == null || product.getArticle() == null
+        if (product == null) {
+            throw new InvalidProductDataException(
+                    "Необходимо передать данные товара.");
+        }
+
+        if (product.getArticle() == null
                 || product.getArticle().isBlank()) {
-            throw new IllegalArgumentException(
-                    "Необходимо указать артикул товара");
+            throw new InvalidProductDataException(
+                    "Необходимо указать артикул товара.");
         }
 
         if (repository.existsById(product.getArticle())) {
-            throw new IllegalArgumentException(
-                    "Товар с таким артикулом уже существует");
+            throw new ProductAlreadyExistsException(
+                    product.getArticle());
         }
 
         return toProduct(repository.save(toEntity(product)));
@@ -56,25 +63,30 @@ public class ProductJpaServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(String article, Product product) {
-        if (article == null || article.isBlank() || product == null) {
-            throw new IllegalArgumentException(
-                    "Необходимо указать артикул и товар");
+        if (article == null || article.isBlank()) {
+            throw new InvalidProductDataException(
+                    "Необходимо указать артикул товара.");
+        }
+
+        if (product == null) {
+            throw new InvalidProductDataException(
+                    "Необходимо передать данные для обновления товара.");
         }
 
         if (!repository.existsById(article)) {
-            throw new IllegalArgumentException(
-                    "Товар не найден: " + article);
+            throw new ProductNotFoundException(article);
         }
 
         product.setArticle(article);
+
         return toProduct(repository.save(toEntity(product)));
     }
 
     @Override
     public boolean deleteProduct(String article) {
         if (article == null || article.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Артикул товара не может быть пустым");
+            throw new InvalidProductDataException(
+                    "Артикул товара не может быть пустым.");
         }
 
         if (!repository.existsById(article)) {
@@ -84,6 +96,7 @@ public class ProductJpaServiceImpl implements ProductService {
         repository.deleteById(article);
         return true;
     }
+
     @Override
     public List<Product> getFilteredProducts(
             String category,
@@ -95,15 +108,19 @@ public class ProductJpaServiceImpl implements ProductService {
                 .filter(product ->
                         category == null || category.isBlank()
                                 || (product.getCategory() != null
-                                && product.getCategory().equalsIgnoreCase(category)))
+                                && product.getCategory()
+                                .equalsIgnoreCase(category)))
                 .filter(product ->
                         minPrice == null
-                                || product.getPrice().compareTo(minPrice) >= 0)
+                                || product.getPrice()
+                                .compareTo(minPrice) >= 0)
                 .filter(product ->
                         maxPrice == null
-                                || product.getPrice().compareTo(maxPrice) <= 0)
+                                || product.getPrice()
+                                .compareTo(maxPrice) <= 0)
                 .toList();
     }
+
     private ProductEntity toEntity(Product product) {
         return new ProductEntity(
                 product.getArticle(),
@@ -118,30 +135,38 @@ public class ProductJpaServiceImpl implements ProductService {
                 ? ""
                 : entity.getCategory().toLowerCase();
 
-        if (category.contains("смартфон")) {
+        if (category.contains("СЃРјР°СЂС‚С„РѕРЅ")) {
             return new SmartphoneProduct(
-                    entity.getArticle(), entity.getProductName(),
-                    entity.getCategory(), entity.getPrice(),
+                    entity.getArticle(),
+                    entity.getProductName(),
+                    entity.getCategory(),
+                    entity.getPrice(),
                     entity.getStockQuantity());
         }
 
-        if (category.contains("ноутбук")) {
+        if (category.contains("РЅРѕСѓС‚Р±СѓРє")) {
             return new LaptopProduct(
-                    entity.getArticle(), entity.getProductName(),
-                    entity.getCategory(), entity.getPrice(),
+                    entity.getArticle(),
+                    entity.getProductName(),
+                    entity.getCategory(),
+                    entity.getPrice(),
                     entity.getStockQuantity());
         }
 
-        if (category.contains("телевизор")) {
+        if (category.contains("С‚РµР»РµРІРёР·РѕСЂ")) {
             return new TelevisionProduct(
-                    entity.getArticle(), entity.getProductName(),
-                    entity.getCategory(), entity.getPrice(),
+                    entity.getArticle(),
+                    entity.getProductName(),
+                    entity.getCategory(),
+                    entity.getPrice(),
                     entity.getStockQuantity());
         }
 
         return new SmartphoneProduct(
-                entity.getArticle(), entity.getProductName(),
-                entity.getCategory(), entity.getPrice(),
+                entity.getArticle(),
+                entity.getProductName(),
+                entity.getCategory(),
+                entity.getPrice(),
                 entity.getStockQuantity());
     }
 }
