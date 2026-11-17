@@ -1,4 +1,3 @@
-
 package com.example.kursovaya.repository;
 
 import com.example.kursovaya.Product;
