@@ -1,61 +1,78 @@
+
 package com.example.kursovaya.exception.handler;
 
 import com.example.kursovaya.exception.InvalidProductDataException;
 import com.example.kursovaya.exception.ProductAlreadyExistsException;
 import com.example.kursovaya.exception.ProductNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GlobalExceptionHandlerTest {
 
-    private GlobalExceptionHandler exceptionHandler;
-
-    @BeforeEach
-    void setUp() {
-        exceptionHandler = new GlobalExceptionHandler();
-    }
+    private final GlobalExceptionHandler exceptionHandler =
+            new GlobalExceptionHandler();
 
     @Test
-    void shouldHandleProductNotFoundException() {
+    void shouldHandleProductNotFound() {
         ProductNotFoundException exception =
-                new ProductNotFoundException("PHONE-001");
+                new ProductNotFoundException("TEST-001");
 
         ResponseEntity<String> response =
                 exceptionHandler.handleProductNotFound(exception);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody().contains("PHONE-001"));
-        assertTrue(response.getBody().contains("не найден"));
+        assertEquals(
+                HttpStatus.NOT_FOUND,
+                response.getStatusCode()
+        );
+
+        assertEquals(
+                "Товар с артикулом 'TEST-001' не найден. Проверьте правильность артикула.",
+                response.getBody()
+        );
     }
 
     @Test
-    void shouldHandleProductAlreadyExistsException() {
+    void shouldHandleProductAlreadyExists() {
         ProductAlreadyExistsException exception =
-                new ProductAlreadyExistsException("PHONE-002");
+                new ProductAlreadyExistsException("TEST-001");
 
         ResponseEntity<String> response =
                 exceptionHandler.handleProductAlreadyExists(exception);
 
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertTrue(response.getBody().contains("PHONE-002"));
-        assertTrue(response.getBody().contains("уже существует"));
+        assertEquals(
+                HttpStatus.CONFLICT,
+                response.getStatusCode()
+        );
+
+        assertEquals(
+                "Товар с артикулом 'TEST-001' уже существует. Используйте другой артикул.",
+                response.getBody()
+        );
     }
 
     @Test
-    void shouldHandleInvalidProductDataException() {
+    void shouldHandleInvalidProductData() {
         InvalidProductDataException exception =
                 new InvalidProductDataException(
-                        "Некорректная цена товара.");
+                        "Некорректные данные товара"
+                );
 
         ResponseEntity<String> response =
                 exceptionHandler.handleInvalidProductData(exception);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Некорректная цена товара.", response.getBody());
+        assertEquals(
+                HttpStatus.BAD_REQUEST,
+                response.getStatusCode()
+        );
+
+        assertEquals(
+                "Некорректные данные товара",
+                response.getBody()
+        );
     }
 
     @Test
@@ -72,7 +89,11 @@ class GlobalExceptionHandlerTest {
         );
 
         assertTrue(response.getBody().contains(
-                "Произошла внутренняя ошибка сервера."
+                "Произошла внутренняя ошибка сервера:"
+        ));
+
+        assertTrue(response.getBody().contains(
+                "Обратитесь к администратору."
         ));
     }
 }

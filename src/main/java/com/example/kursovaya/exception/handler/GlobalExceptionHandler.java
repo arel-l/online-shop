@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Произошла внутренняя ошибка сервера. "
-                        + "Обратитесь к администратору.");
+                .body("Произошла внутренняя ошибка сервера: " +
+                        "\nОбратитесь к администратору.");
     }
 }
