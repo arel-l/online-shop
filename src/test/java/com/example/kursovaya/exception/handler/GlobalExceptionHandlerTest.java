@@ -1,4 +1,3 @@
-
 package com.example.kursovaya.exception.handler;
 
 import com.example.kursovaya.exception.InvalidProductDataException;

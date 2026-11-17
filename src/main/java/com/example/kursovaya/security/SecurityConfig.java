@@ -1,4 +1,3 @@
-
 package com.example.kursovaya.security;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.context.annotation.Bean;
