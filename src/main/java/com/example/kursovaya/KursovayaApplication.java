@@ -1,4 +1,3 @@
-
 package com.example.kursovaya;
 
 import org.springframework.boot.SpringApplication;

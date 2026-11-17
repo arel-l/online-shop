@@ -1,5 +1,7 @@
+
 package com.example.kursovaya;
 
+import com.example.kursovaya.exception.ProductAlreadyExistsException;
 import com.example.kursovaya.repository.impl.InMemoryProductRepository;
 import com.example.kursovaya.service.impl.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,10 +55,13 @@ class ProductServiceTest {
 
         productService.addProduct(product);
 
-        assertThrows(
-                IllegalArgumentException.class,
+        ProductAlreadyExistsException exception = assertThrows(
+                ProductAlreadyExistsException.class,
                 () -> productService.addProduct(product)
         );
+
+        assertTrue(exception.getMessage().contains("PHONE-002"));
+        assertTrue(exception.getMessage().contains("уже существует"));
     }
 
     @Test
